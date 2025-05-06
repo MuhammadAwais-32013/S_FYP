@@ -141,7 +141,7 @@ export default function AddMedicalRecord() {
           </div>
         )}
         
-        <div className="card">
+        <div className="card bg-gradient-to-br from-white to-blue-50 border-blue-100">
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-blue-800 mb-2">Health Information</h2>
             <p className="text-sm text-gray-600">
@@ -171,6 +171,7 @@ export default function AddMedicalRecord() {
                   />
                 </div>
                 {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
+                <p className="mt-1 text-xs text-gray-500">Date of the health record</p>
               </div>
               
               <div>
@@ -189,7 +190,7 @@ export default function AddMedicalRecord() {
                     name="bloodPressure"
                     value={formData.bloodPressure}
                     onChange={handleChange}
-                    placeholder="e.g., 120/80"
+                    placeholder="Enter your blood pressure (e.g., 120/80)"
                     className={`form-input pl-10 ${errors.bloodPressure ? 'border-red-500' : ''}`}
                   />
                 </div>
@@ -217,13 +218,13 @@ export default function AddMedicalRecord() {
                     name="bloodSugar"
                     value={formData.bloodSugar}
                     onChange={handleChange}
-                    placeholder="e.g., 100"
+                    placeholder="Enter your blood sugar level in mg/dL"
                     className={`form-input pl-10 ${errors.bloodSugar ? 'border-red-500' : ''}`}
                   />
                 </div>
                 {errors.bloodSugar && <p className="mt-1 text-sm text-red-600">{errors.bloodSugar}</p>}
                 {!errors.bloodSugar && (
-                  <p className="mt-1 text-xs text-gray-500">Fasting blood glucose level</p>
+                  <p className="mt-1 text-xs text-gray-500">Fasting blood glucose level (normal range: 70-100 mg/dL)</p>
                 )}
               </div>
               
@@ -235,10 +236,10 @@ export default function AddMedicalRecord() {
                   value={formData.notes}
                   onChange={handleChange}
                   rows="4"
-                  placeholder="Add any additional information about your health, medications, exercise, etc."
+                  placeholder="Enter any additional information about your health, medications, exercise, diet changes, or how you're feeling today."
                   className="form-input"
                 ></textarea>
-                <p className="mt-1 text-xs text-gray-500">Optional: Include any relevant health information</p>
+                <p className="mt-1 text-xs text-gray-500">Optional: Include any relevant health information or lifestyle changes</p>
               </div>
             </div>
             

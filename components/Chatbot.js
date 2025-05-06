@@ -142,7 +142,7 @@ const Chatbot = ({ isOpen, onClose }) => {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Ask about diet, nutrition, health tips..."
           className="form-input flex-1 rounded-full focus:ring-blue-400"
         />
         <button 

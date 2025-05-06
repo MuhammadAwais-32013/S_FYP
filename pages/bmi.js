@@ -179,7 +179,7 @@ export default function BMICalculator() {
         )}
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="card">
+          <div className="card bg-gradient-to-br from-white to-blue-50 border-blue-100">
             <h2 className="text-xl font-semibold mb-4 text-blue-800">Enter Your Measurements</h2>
             <p className="mb-6 text-gray-600">
               Enter your height and weight to calculate your Body Mass Index (BMI).
@@ -196,7 +196,7 @@ export default function BMICalculator() {
                     name="height"
                     value={formData.height}
                     onChange={handleChange}
-                    placeholder="e.g., 170"
+                    placeholder="Enter your height in centimeters"
                     className={`form-input pl-10 ${errors.height ? 'border-red-500' : ''}`}
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
@@ -206,6 +206,7 @@ export default function BMICalculator() {
                   </div>
                 </div>
                 {errors.height && <p className="mt-1 text-sm text-red-600">{errors.height}</p>}
+                <p className="mt-1 text-xs text-gray-500">Example: 170 for 170cm (5'7")</p>
               </div>
               
               <div className="mb-6">
@@ -217,7 +218,7 @@ export default function BMICalculator() {
                     name="weight"
                     value={formData.weight}
                     onChange={handleChange}
-                    placeholder="e.g., 70"
+                    placeholder="Enter your weight in kilograms"
                     className={`form-input pl-10 ${errors.weight ? 'border-red-500' : ''}`}
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
@@ -227,6 +228,7 @@ export default function BMICalculator() {
                   </div>
                 </div>
                 {errors.weight && <p className="mt-1 text-sm text-red-600">{errors.weight}</p>}
+                <p className="mt-1 text-xs text-gray-500">Example: 70 for 70kg (154 lbs)</p>
               </div>
               
               <button 

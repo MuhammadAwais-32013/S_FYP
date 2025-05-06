@@ -1,0 +1,12 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/bmi": "pages/bmi.js",
+  "/": "pages/index.js",
+  "/diet-plan": "pages/diet-plan.js",
+  "/records": "pages/records.js",
+  "/records/add": "pages/records/add.js",
+  "/signup": "pages/signup.js",
+  "/login": "pages/login.js"
+}

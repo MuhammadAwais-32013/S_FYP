@@ -2,10 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/bmi": "pages/bmi.js",
-  "/login": "pages/login.js",
-  "/records": "pages/records.js",
-  "/records/add": "pages/records/add.js",
-  "/diet-plan": "pages/diet-plan.js"
+  "/": "pages/index.js"
 }

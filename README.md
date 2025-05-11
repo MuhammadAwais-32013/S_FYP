@@ -1,28 +1,64 @@
-# AI Diet Consultant
+# NutriAI Diet Consultant
 
-A simple web application that provides personalized diet plans based on BMI calculations and allows users to track their medical records.
+A modern web application that provides personalized diet plans based on BMI calculations and health metrics, with session persistence and comprehensive user tracking.
 
 ## Features
 
-- User authentication (signup/login)
-- BMI calculation
-- Personalized diet plan recommendations
-- Medical record tracking
-- AI Diet Assistant chatbot
+- **User Authentication**
+  - Secure signup and login
+  - Session persistence across page refreshes and browser tabs
+  - User profile management
+
+- **Health Assessment**
+  - BMI calculation with detailed health insights
+  - Health category classification with personalized recommendations
+  - Visualized BMI results with color-coded categories
+
+- **Personalized Diet Plans**
+  - AI-generated meal plans based on BMI and health profile
+  - Detailed meal breakdowns (breakfast, lunch, dinner, snacks)
+  - Nutritional recommendations and dietary tips
+  - Diet plan regeneration option
+
+- **Health Tracking**
+  - Medical record tracking with historical data
+  - Blood pressure and blood sugar monitoring
+  - Statistics and trends visualization
+  - Filterable health record history
+
+- **Admin Features**
+  - Comprehensive admin dashboard
+  - User management interface
+  - Database records viewing in tabular format
+  - Detailed diet plan inspection with modal views
+
+- **AI Diet Assistant**
+  - Interactive chatbot for nutritional advice
+  - Personalized responses based on user health data
+  - Diet and nutrition FAQ support
+
+- **Navigation**
+  - Consistent back-to-dashboard navigation across all pages
+  - Intuitive user interface with clear pathways
+  - Mobile-responsive design for all devices
 
 ## Tech Stack
 
 ### Frontend
-- Next.js
-- React
-- Tailwind CSS
+- Next.js (React framework)
+- React Hooks and Context API for state management
+- Tailwind CSS for styling
 - Axios for API calls
+- LocalStorage for session persistence
+- Responsive design with mobile-first approach
 
 ### Backend
-- Flask
-- SQLAlchemy (ORM)
-- MySQL database
-- bcrypt for password hashing
+- Flask (Python web framework)
+- SQLAlchemy ORM for database operations
+- MySQL database for data storage
+- bcrypt for password security
+- RESTful API architecture
+- AI integration for diet recommendations
 
 ## Setup Instructions
 
@@ -70,37 +106,87 @@ A simple web application that provides personalized diet plans based on BMI calc
    ```
    The frontend will run on http://localhost:3000
 
-## Usage
+## Usage Guide
 
-1. Sign up for a new account
-2. Log in with your credentials
-3. Calculate your BMI
-4. View your personalized diet plan
-5. Add and track your medical records
-6. Chat with the Diet Assistant for additional help
+### For Users
+1. **Sign up/Log in**: Create a new account or log in with existing credentials
+2. **Calculate BMI**: Enter height and weight to get your BMI calculation
+3. **View Diet Plan**: Receive a personalized diet plan based on your BMI
+4. **Track Health**: Add and monitor health metrics like blood pressure and blood sugar
+5. **Consult AI Assistant**: Get dietary advice from the AI chatbot
+
+### For Administrators
+1. **Access Admin Panel**: Log in with admin credentials
+2. **Manage Users**: View and manage user accounts
+3. **View Health Data**: Access user BMI records and medical history
+4. **Inspect Diet Plans**: View detailed diet plans for all users
+5. **Database Viewing**: Access all database records in tabular format
 
 ## Project Structure
 
 ### Frontend
 - `/pages` - Next.js pages and routing
+  - `/admin` - Administrator dashboard and management tools
+  - `/records` - Health record management
 - `/components` - Reusable React components
-- `/context` - React context for auth state
-- `/utils` - Utility functions and API calls
+  - `BackToDashboard.js` - Navigation component for consistent UI
+  - `Header.js` - Main navigation header
+  - `DietChart.js` - Diet visualization component
+- `/context` - React context for state management (auth, themes)
+- `/utils` - Utility functions and API integration
 - `/styles` - Global CSS and Tailwind configuration
 
 ### Backend
-- `app.py` - Main Flask application
-- `models.py` - SQLAlchemy database models
-- `.env` - Environment variables
+- `app.py` - Main Flask application entry point
+- `models.py` - SQLAlchemy database models and schemas
+- `routes/` - API route handlers
+- `.env` - Environment variables and configuration
 - `requirements.txt` - Python dependencies
 
-## Note
+## Session Management
 
-This is a beginner-friendly project meant for educational purposes. In a production environment, you would want to implement:
+The application implements robust session management through:
+- Secure token storage in localStorage
+- Context API for global auth state
+- Automatic session restoration on page refresh
+- Protected routes with authentication checks
+- Intuitive login/logout flow
 
-- JWT-based authentication
-- Password reset functionality
-- Form validation on the server side
-- More comprehensive error handling
-- Data visualization for medical records
-- Unit and integration tests 
+## Data Visualization
+
+Health data is visualized through:
+- Color-coded BMI categories
+- Statistical averages for health metrics
+- Historical trend displays
+- Meal plan visualization with nutritional breakdown
+
+## Security Features
+
+- Password hashing with bcrypt
+- Protected API endpoints
+- Authentication middleware
+- Input validation
+- Secure session management
+
+## Future Enhancements
+
+- Enhanced data visualization with charts and graphs
+- Integration with wearable health devices
+- Expanded AI capabilities for more personalized advice
+- Meal planning calendar and reminders
+- Social sharing features for progress
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributors
+
+- Your Name - Initial work and ongoing development
+
+## Acknowledgments
+
+- Tailwind CSS for the UI framework
+- Next.js team for the React framework
+- Flask for the backend architecture
+- AI research community for diet recommendation algorithms 

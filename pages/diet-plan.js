@@ -5,6 +5,7 @@ import { getDietPlan, generateDietPlan } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import DietChart from '../components/DietChart';
 import Layout from '../components/Layout';
+import BackToDashboard from '../components/BackToDashboard';
 
 export default function DietPlan() {
   const router = useRouter();
@@ -184,6 +185,8 @@ export default function DietPlan() {
       </div>
         
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pb-12">
+        <BackToDashboard />
+        
         {error && (
           <div className="p-4 mb-6 rounded-lg bg-red-100 text-red-700 border border-red-200">
             <div className="flex items-center">

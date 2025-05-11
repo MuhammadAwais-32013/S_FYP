@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { getMedicalRecords } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
+import BackToDashboard from '../../components/BackToDashboard';
 
 export default function MedicalRecords() {
   const router = useRouter();
@@ -109,6 +110,8 @@ export default function MedicalRecords() {
       </Head>
 
       <div className="max-w-5xl mx-auto">
+        <BackToDashboard />
+        
         <div className="mb-8 text-center">
           <h1 className="text-3xl gradient-heading mb-4">Medical Records</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">

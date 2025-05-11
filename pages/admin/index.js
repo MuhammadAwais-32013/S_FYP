@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import BackToDashboard from '../../components/BackToDashboard';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -283,10 +284,12 @@ export default function AdminDashboard() {
       </Head>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <BackToDashboard />
+        
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
           <p className="text-gray-600">
-            View and manage database records from this admin interface.
+            View and manage users, BMI records, diet plans, and medical records.
           </p>
         </div>
 

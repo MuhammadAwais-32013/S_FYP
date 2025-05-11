@@ -3,12 +3,14 @@ import { useRouter } from 'next/router';
 import Header from './Header';
 import Footer from './Footer';
 import Chatbot from './Chatbot';
+import { useAuth } from '../context/AuthContext';
 
 const Layout = ({ children }) => {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   
-  // Don't show chatbot button on login or signup pages
+  // Don't show chatbot button on login or signup pages, but always show on other pages regardless of login status
   const showChatbot = !router.pathname.includes('/login') && !router.pathname.includes('/signup');
   
   // Check if the current route is login or signup to adjust padding
@@ -24,7 +26,7 @@ const Layout = ({ children }) => {
       
       <Footer />
       
-      {/* Chatbot */}
+      {/* Chatbot - visible to all users, but functionality restricted to logged in users */}
       {showChatbot && (
         <>
           <button

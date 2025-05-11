@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
 const Chatbot = ({ isOpen, onClose }) => {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const [messages, setMessages] = useState([
     { text: 'Hello! I am your AI Diet Assistant. How can I help you today?', isBot: true }
   ]);
@@ -34,6 +38,12 @@ const Chatbot = ({ isOpen, onClose }) => {
     { key: 'dietaryPreferences', question: 'Do you have any dietary preferences or restrictions? (e.g., vegetarian, vegan, gluten-free, etc.)' },
     { key: 'goal', question: 'What is your main goal? (weight loss/muscle gain/maintenance)' }
   ];
+
+  // Redirect to login if not logged in
+  const handleRedirectToLogin = () => {
+    router.push('/login');
+    onClose();
+  };
 
   const handleUserInfo = (input) => {
     const currentKey = questions[currentQuestion].key;
@@ -410,6 +420,71 @@ const Chatbot = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // If user is not logged in, show login prompt instead of chat interface
+  if (!isLoggedIn) {
+    return (
+      <div className="fixed bottom-4 right-4 w-96 bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 z-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-14a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-white font-semibold text-lg">AI Diet Assistant</h2>
+              <p className="text-blue-100 text-sm">Login Required</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="text-white hover:bg-blue-700 p-2 rounded-full transition-colors"
+            aria-label="Close chatbot"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="p-6 flex flex-col items-center text-center">
+          <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4 ring-4 ring-blue-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Login Required</h3>
+          <p className="text-gray-600 mb-6">To access our AI Diet Assistant and get personalized nutrition advice, please log in to your account.</p>
+          
+          <div className="w-full space-y-3">
+            <button 
+              onClick={handleRedirectToLogin}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-md hover:shadow-lg transition-all duration-200 flex items-center justify-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V7.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0011.586 3H3zm5 4a1 1 0 00-1 1v4a1 1 0 002 0v-4a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Log In to Continue
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full bg-gray-100 text-gray-700 py-2.5 px-4 rounded-md hover:bg-gray-200 transition-all duration-200"
+            >
+              Close
+            </button>
+          </div>
+          
+          <div className="mt-5 pt-5 border-t border-gray-100 w-full">
+            <p className="text-xs text-gray-500">
+              Unlock personalized diet plans, nutrition advice, and health tracking features with a secure account.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed bottom-4 right-4 w-96 h-[550px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200 z-50">
       {/* Header */}
@@ -421,7 +496,7 @@ const Chatbot = ({ isOpen, onClose }) => {
             </svg>
           </div>
           <div>
-            <h2 className="text-white font-semibold text-lg">Medical Assistant</h2>
+            <h2 className="text-white font-semibold text-lg">AI Diet Assistant</h2>
             <p className="text-blue-100 text-sm">Online 24/7</p>
           </div>
         </div>

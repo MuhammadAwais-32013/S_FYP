@@ -287,5 +287,65 @@ def get_medical_records():
         'records': [record.to_dict() for record in records]
     }), 200
 
+# Admin API endpoints
+@app.route('/api/admin/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify({
+        'success': True,
+        'users': [user.to_dict() for user in users]
+    }), 200
+
+@app.route('/api/admin/bmi', methods=['GET'])
+def get_bmi_records():
+    user_id = request.args.get('user_id', 'all')
+    
+    if user_id != 'all':
+        bmi_records = BMI.query.filter_by(user_id=int(user_id)).order_by(BMI.timestamp.desc()).all()
+    else:
+        bmi_records = BMI.query.order_by(BMI.timestamp.desc()).all()
+    
+    return jsonify({
+        'success': True,
+        'bmi_records': [record.to_dict() for record in bmi_records]
+    }), 200
+
+@app.route('/api/admin/diet-plans', methods=['GET'])
+def get_diet_plans():
+    user_id = request.args.get('user_id', 'all')
+    
+    if user_id != 'all':
+        diet_plans = DietPlan.query.filter_by(user_id=int(user_id)).order_by(DietPlan.created_at.desc()).all()
+    else:
+        diet_plans = DietPlan.query.order_by(DietPlan.created_at.desc()).all()
+    
+    return jsonify({
+        'success': True,
+        'diet_plans': [
+            {
+                'id': plan.id,
+                'user_id': plan.user_id,
+                'bmi': plan.bmi,
+                'created_at': plan.created_at.isoformat(),
+                'plan': json.loads(plan.plan)
+            }
+            for plan in diet_plans
+        ]
+    }), 200
+
+@app.route('/api/admin/medical-records', methods=['GET'])
+def get_all_medical_records():
+    user_id = request.args.get('user_id', 'all')
+    
+    if user_id != 'all':
+        records = MedicalRecord.query.filter_by(user_id=int(user_id)).order_by(MedicalRecord.date.desc()).all()
+    else:
+        records = MedicalRecord.query.order_by(MedicalRecord.date.desc()).all()
+    
+    return jsonify({
+        'success': True,
+        'records': [record.to_dict() for record in records]
+    }), 200
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) 

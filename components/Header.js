@@ -61,6 +61,12 @@ export default function Header() {
                 <Link href="/records" className={`${isActive('/records')} text-sm font-medium transition-colors`}>
                   Health Records
                 </Link>
+                <Link href="/admin" className={`${isActive('/admin')} text-sm font-medium transition-colors`}>
+                  Admin Dashboard
+                </Link>
+                <Link href="/db-view" className={`${isActive('/db-view')} text-sm font-medium transition-colors`}>
+                  DB Viewer
+                </Link>
                 
                 <div className="relative ml-3 flex items-center">
                   <div className="flex items-center">
@@ -127,6 +133,12 @@ export default function Header() {
                 </Link>
                 <Link href="/records" className={`${router.pathname === '/records' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'} block px-3 py-2 rounded-md text-base font-medium`}>
                   Health Records
+                </Link>
+                <Link href="/admin" className={`${router.pathname === '/admin' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'} block px-3 py-2 rounded-md text-base font-medium`}>
+                  Admin Dashboard
+                </Link>
+                <Link href="/db-view" className={`${router.pathname === '/db-view' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'} block px-3 py-2 rounded-md text-base font-medium`}>
+                  DB Viewer
                 </Link>
                 <div className="px-3 py-3 flex items-center justify-between border-t border-gray-200 mt-2">
                   <div className="flex items-center">

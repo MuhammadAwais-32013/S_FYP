@@ -104,10 +104,12 @@ const Chatbot = ({ isOpen, onClose }) => {
 
                 Please provide:
                 1. A brief analysis of their current situation
-                2. Specific dietary recommendations
-                3. Exercise suggestions
-                4. Lifestyle modifications
-                5. Important precautions or considerations
+                2. Specific dietary recommendations with food examples
+                3. Detailed exercise suggestions appropriate for their fitness level
+                4. Workout routines that complement their dietary goals
+                5. Pre and post-workout nutrition recommendations
+                6. Lifestyle modifications for better adherence
+                7. Important precautions or considerations
                 
                 Keep the response clear, practical, and easy to follow.`
               }]
@@ -181,7 +183,9 @@ const Chatbot = ({ isOpen, onClose }) => {
       const personalizedKeywords = [
         'diet plan', 'meal plan', 'weight loss plan', 'weight gain plan',
         'personalized diet', 'custom diet', 'specific diet', 'my diet',
-        'weight management', 'nutrition plan', 'eating plan'
+        'weight management', 'nutrition plan', 'eating plan', 'workout plan',
+        'exercise routine', 'fitness plan', 'training program', 'my workout',
+        'personal fitness', 'custom workout', 'sports nutrition', 'exercise recommendation'
       ];
       
       const isPersonalizedQuery = personalizedKeywords.some(keyword => 
@@ -222,7 +226,15 @@ const Chatbot = ({ isOpen, onClose }) => {
                 - Caloric intake and macronutrients
                 - Healthy eating habits
                 - Weight management through diet
-
+                - Exercise recommendations and fitness tips
+                - Workout routines that complement diet plans
+                - Pre and post-workout nutrition
+                - Sports nutrition and hydration guidance
+                - Lifestyle modifications for better health
+                - Tips for maintaining healthy habits
+                - Supplements and their nutritional impact
+                
+                Words like (Hi, Hello, or any other) conversation starter word should be answer on appropiate way like Hello i am Diet Assitant to help you etc
                 For ANY queries not related to nutrition or diet (including other medical topics), you must ONLY respond with:
                 "I apologize, but I'm specifically designed to assist with nutrition and diet-related questions only. For other medical concerns, please consult with a qualified healthcare professional. I'd be happy to help you with any questions about diet planning, nutrition, or healthy eating habits."
 

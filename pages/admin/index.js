@@ -7,26 +7,30 @@ import BackToDashboard from '../../components/BackToDashboard';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('users');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPlanModal, setShowPlanModal] = useState(false);
   
   const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
-    // Redirect if not logged in
-    if (!isLoggedIn) {
+    // Only redirect if auth loading is complete and user is not logged in
+    if (!isLoading && !isLoggedIn) {
       router.push('/login');
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, isLoading, router]);
 
   useEffect(() => {
-    // Load data based on active tab
-    fetchData(activeTab);
-  }, [activeTab]);
+    // Only fetch data if the user is logged in and not in loading state
+    if (isLoggedIn && !isLoading) {
+      fetchData(activeTab);
+    }
+  }, [activeTab, isLoggedIn, isLoading]);
 
   const fetchData = async (tab) => {
     setLoading(true);
@@ -249,8 +253,101 @@ export default function AdminDashboard() {
   };
 
   const handleViewPlan = (plan) => {
-    // You can implement a modal or expand the row to show plan details
-    alert(JSON.stringify(plan.plan, null, 2));
+    setSelectedPlan(plan);
+    setShowPlanModal(true);
+  };
+
+  const renderPlanDetails = () => {
+    if (!selectedPlan || !selectedPlan.plan) return null;
+    
+    const plan = selectedPlan.plan;
+    
+    return (
+      <div className="space-y-6">
+        {/* Diet Plan Summary */}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Diet Plan Summary</h3>
+          <div className="bg-blue-50 p-4 rounded-md">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">User ID</p>
+                <p className="font-medium">{selectedPlan.user_id}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">BMI</p>
+                <p className="font-medium">{selectedPlan.bmi?.toFixed(2) || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Created Date</p>
+                <p className="font-medium">{new Date(selectedPlan.created_at).toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Calories</p>
+                <p className="font-medium">{plan.calories || "Not specified"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Meals Table */}
+        {plan.meals && (
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Meals</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 border">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meal Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Food Items</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {Object.entries(plan.meals).map(([mealType, items]) => (
+                    <tr key={mealType} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {mealType}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        <ul className="list-disc pl-5 space-y-1">
+                          {Array.isArray(items) ? (
+                            items.map((item, idx) => (
+                              <li key={idx}>{item}</li>
+                            ))
+                          ) : (
+                            <li>No items specified</li>
+                          )}
+                        </ul>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        
+        {/* Recommendations Table */}
+        {plan.recommendations && (
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Recommendations</h3>
+            <div className="bg-white rounded-md border border-gray-200">
+              <ul className="divide-y divide-gray-200">
+                {plan.recommendations.map((recommendation, idx) => (
+                  <li key={idx} className="px-6 py-4 flex items-start">
+                    <div className="flex-shrink-0 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-3 mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3 text-green-600">
+                        <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-gray-700">{recommendation}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const getCategoryColorClass = (category) => {
@@ -273,8 +370,16 @@ export default function AdminDashboard() {
     setSelectedUser(null); // Reset selected user when changing tabs
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   if (!isLoggedIn) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Redirecting to login...</div>;
   }
 
   return (
@@ -360,6 +465,41 @@ export default function AdminDashboard() {
         <div className="bg-white shadow rounded-lg overflow-hidden">
           {renderTable()}
         </div>
+
+        {/* Diet Plan Modal */}
+        {showPlanModal && selectedPlan && (
+          <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="diet-plan-modal" role="dialog" aria-modal="true">
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              {/* Background overlay */}
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowPlanModal(false)}></div>
+              
+              {/* Modal panel */}
+              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
+                        Diet Plan Details
+                      </h3>
+                      <div className="mt-2">
+                        {renderPlanDetails()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    onClick={() => setShowPlanModal(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

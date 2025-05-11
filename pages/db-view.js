@@ -7,7 +7,7 @@ import BackToDashboard from '../components/BackToDashboard';
 
 export default function DatabaseViewer() {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
   const [data, setData] = useState({
     users: [],
     bmi: [],
@@ -22,15 +22,17 @@ export default function DatabaseViewer() {
   const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
-    // Redirect if not logged in
-    if (!isLoggedIn) {
+    // Only redirect if auth loading is complete and user is not logged in
+    if (!isLoading && !isLoggedIn) {
       router.push('/login');
       return;
     }
 
-    // Load all data
-    fetchAllData();
-  }, [isLoggedIn, router]);
+    // Only load data if user is logged in and not in loading state
+    if (isLoggedIn && !isLoading) {
+      fetchAllData();
+    }
+  }, [isLoggedIn, isLoading, router]);
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -327,8 +329,16 @@ export default function DatabaseViewer() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   if (!isLoggedIn) {
-    return <div>Redirecting to login...</div>;
+    return <div className="flex justify-center items-center h-screen">Redirecting to login...</div>;
   }
 
   return (

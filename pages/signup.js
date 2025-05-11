@@ -65,11 +65,19 @@ export default function Signup() {
     setMessage({ text: '', type: '' });
     
     try {
+      console.log('Submitting signup form with data:', { 
+        name: formData.name,
+        email: formData.email,
+        password: formData.password.length + ' characters' // Log password length only for security
+      });
+      
       const data = await signUp({
         name: formData.name,
         email: formData.email,
         password: formData.password
       });
+      
+      console.log('Signup response received:', data);
       
       if (data.success) {
         setMessage({ 
@@ -80,14 +88,16 @@ export default function Signup() {
           router.push('/login');
         }, 2000);
       } else {
+        console.error('Signup failed with error:', data.error);
         setMessage({ 
           text: data.error || 'Failed to create account. Please try again.', 
           type: 'error' 
         });
       }
     } catch (error) {
+      console.error('Signup exception:', error);
       setMessage({ 
-        text: 'An unexpected error occurred. Please try again.', 
+        text: `Error: ${error.message || 'An unexpected error occurred. Please try again.'}`, 
         type: 'error' 
       });
     } finally {

@@ -54,19 +54,24 @@ export default function Login() {
     setError('');
     
     try {
+      console.log('Login attempt with:', formData.email);
       const data = await login({
         email: formData.email,
         password: formData.password
       });
+      
+      console.log('Login response:', data);
       
       if (data.success) {
         // Update auth context
         loginUser({ name: data.name });
         router.push('/');
       } else {
+        console.error('Login failed:', data.error);
         setError(data.error || 'Invalid email or password');
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import { getMedicalRecords } from '../utils/api';
 
 const Chatbot = ({ isOpen, onClose }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userId } = useAuth();
   const router = useRouter();
   const [messages, setMessages] = useState([
     { text: 'Hello! I am your AI Diet Assistant. How can I help you today?', isBot: true }
@@ -19,6 +20,8 @@ const Chatbot = ({ isOpen, onClose }) => {
     dietaryPreferences: [],
     goal: null
   });
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [isLoadingMedicalRecords, setIsLoadingMedicalRecords] = useState(false);
   const [isCollectingInfo, setIsCollectingInfo] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const messagesEndRef = useRef(null);
@@ -38,6 +41,59 @@ const Chatbot = ({ isOpen, onClose }) => {
     { key: 'dietaryPreferences', question: 'Do you have any dietary preferences or restrictions? (e.g., vegetarian, vegan, gluten-free, etc.)' },
     { key: 'goal', question: 'What is your main goal? (weight loss/muscle gain/maintenance)' }
   ];
+
+  const fetchMedicalRecords = async () => {
+    if (!isLoggedIn) return null;
+    
+    setIsLoadingMedicalRecords(true);
+    try {
+      const response = await getMedicalRecords();
+      if (response.success) {
+        setMedicalRecords(response.records);
+        return response.records;
+      } else {
+        console.error('Error fetching medical records:', response.error);
+        return null;
+      }
+    } catch (error) {
+      console.error('Failed to fetch medical records:', error);
+      return null;
+    } finally {
+      setIsLoadingMedicalRecords(false);
+    }
+  };
+
+  // Generate medical record summary for the AI
+  const generateMedicalRecordSummary = (records) => {
+    if (!records || records.length === 0) {
+      return "No medical records available.";
+    }
+
+    // Sort records by date (newest first)
+    const sortedRecords = [...records].sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+
+    // Get the most recent record
+    const latestRecord = sortedRecords[0];
+    
+    // Generate summary of all records
+    const recordSummary = sortedRecords.map(record => {
+      return `Date: ${new Date(record.date).toLocaleDateString()}
+Blood Pressure: ${record.bloodPressure}
+Blood Sugar: ${record.bloodSugar} mmol/L
+Notes: ${record.notes || 'None'}`
+    }).join('\n\n');
+
+    return `User's Medical Records Summary:
+Latest Record (${new Date(latestRecord.date).toLocaleDateString()}):
+- Blood Pressure: ${latestRecord.bloodPressure}
+- Blood Sugar: ${latestRecord.bloodSugar} mmol/L
+- Notes: ${latestRecord.notes || 'None'}
+
+Medical History:
+${recordSummary}`;
+  };
 
   // Redirect to login if not logged in
   const handleRedirectToLogin = () => {
@@ -86,6 +142,13 @@ const Chatbot = ({ isOpen, onClose }) => {
       Goal: ${userInfo.goal}
     `;
 
+    // Fetch medical records for personalized diet plan
+    let medicalRecordText = "No medical records available.";
+    const records = await fetchMedicalRecords();
+    if (records && records.length > 0) {
+      medicalRecordText = generateMedicalRecordSummary(records);
+    }
+
     try {
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -98,20 +161,22 @@ const Chatbot = ({ isOpen, onClose }) => {
             {
               role: 'user',
               parts: [{
-                text: `Based on the following user information, provide a personalized diet and health plan. Focus on practical, actionable advice that considers their specific circumstances:
+                text: `Based on the following user information and medical records, provide a personalized diet and health plan. Focus on practical, actionable advice that considers their specific circumstances and health status:
 
                 ${userInfoText}
 
+                ${medicalRecordText}
+
                 Please provide:
-                1. A brief analysis of their current situation
-                2. Specific dietary recommendations with food examples
-                3. Detailed exercise suggestions appropriate for their fitness level
-                4. Workout routines that complement their dietary goals
+                1. A brief analysis of their current situation considering their medical records
+                2. Specific dietary recommendations with food examples tailored to their health status
+                3. Detailed exercise suggestions appropriate for their fitness level and medical conditions
+                4. Workout routines that complement their dietary goals and are safe given their health status
                 5. Pre and post-workout nutrition recommendations
-                6. Lifestyle modifications for better adherence
-                7. Important precautions or considerations
+                6. Lifestyle modifications for better adherence and health management
+                7. Important precautions or considerations based on their medical records
                 
-                Keep the response clear, practical, and easy to follow.`
+                Keep the response clear, practical, and easy to follow. Pay special attention to any health concerns indicated in their medical records.`
               }]
             }
           ],
@@ -179,20 +244,48 @@ const Chatbot = ({ isOpen, onClose }) => {
         return;
       }
 
+      // Check if it's just a greeting
+      const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening'];
+      const isGreeting = greetings.some(greeting => 
+        inputText.toLowerCase().trim() === greeting || 
+        inputText.toLowerCase().trim().startsWith(`${greeting} `)
+      );
+
+      if (isGreeting) {
+        // Respond with a simple greeting without fetching medical records
+        const greetingResponse = "Hello! I'm your Diet Assistant. I can help you with nutrition advice, meal planning, and personalized diet recommendations. How can I assist you today?";
+        
+        setMessages(prev => {
+          const filtered = prev.filter(msg => !msg.isTyping);
+          return [...filtered, { text: greetingResponse, isBot: true }];
+        });
+        return;
+      }
+
       // Check if the message requires personalized information
       const personalizedKeywords = [
         'diet plan', 'meal plan', 'weight loss plan', 'weight gain plan',
         'personalized diet', 'custom diet', 'specific diet', 'my diet',
         'weight management', 'nutrition plan', 'eating plan', 'workout plan',
         'exercise routine', 'fitness plan', 'training program', 'my workout',
-        'personal fitness', 'custom workout', 'sports nutrition', 'exercise recommendation'
+        'personal fitness', 'custom workout', 'sports nutrition', 'exercise recommendation',
+        'my medical', 'my health', 'my condition', 'based on my health'
       ];
       
-      const isPersonalizedQuery = personalizedKeywords.some(keyword => 
+      // Check if this is a diet query that needs personalization based on medical records
+      const needsMedicalRecords = personalizedKeywords.some(keyword => 
         inputText.toLowerCase().includes(keyword)
       );
+      
+      // Check if this is any diet-related query
+      const isDietRelatedQuery = needsMedicalRecords || 
+        inputText.toLowerCase().includes('diet') || 
+        inputText.toLowerCase().includes('nutrition') ||
+        inputText.toLowerCase().includes('food') ||
+        inputText.toLowerCase().includes('eating') ||
+        inputText.toLowerCase().includes('meal');
 
-      if (isPersonalizedQuery) {
+      if (personalizedKeywords.some(keyword => inputText.toLowerCase().includes(keyword))) {
         setIsCollectingInfo(true);
         setCurrentQuestion(0);
         setMessages(prev => {
@@ -203,6 +296,15 @@ const Chatbot = ({ isOpen, onClose }) => {
           }];
         });
         return;
+      }
+
+      // For personalized diet queries, fetch medical records only if needed
+      let medicalRecordText = "No medical records available.";
+      if (needsMedicalRecords) {
+        const records = await fetchMedicalRecords();
+        if (records && records.length > 0) {
+          medicalRecordText = generateMedicalRecordSummary(records);
+        }
       }
 
       // For general nutrition queries, use the regular conversation flow
@@ -234,11 +336,24 @@ const Chatbot = ({ isOpen, onClose }) => {
                 - Tips for maintaining healthy habits
                 - Supplements and their nutritional impact
                 
-                Words like (Hi, Hello, or any other) conversation starter word should be answer on appropiate way like Hello i am Diet Assitant to help you etc
+                ${needsMedicalRecords ? `IMPORTANT: This is a personalized diet query that requires consideration of the user's medical records.
+                The user has the following medical information that should inform your recommendations:
+                ${medicalRecordText}
+                
+                If the records show high blood pressure or high blood sugar, adjust your dietary recommendations accordingly.` : 
+                "This is a general query that doesn't require personalized medical information. Provide general nutrition information without referring to user's specific medical records."}
+                
                 For ANY queries not related to nutrition or diet (including other medical topics), you must ONLY respond with:
                 "I apologize, but I'm specifically designed to assist with nutrition and diet-related questions only. For other medical concerns, please consult with a qualified healthcare professional. I'd be happy to help you with any questions about diet planning, nutrition, or healthy eating habits."
 
                 DO NOT provide any information about medical conditions, diseases, or health issues beyond their dietary aspects.
+
+                User Query: ${inputText}
+                
+                ${needsMedicalRecords ? `Remember: Your recommendations should be tailored to the user's specific health profile indicated in their medical records.
+                If they have high blood pressure, recommend a low-sodium diet.
+                If they have high blood sugar, recommend a low-glycemic index diet.
+                Always prioritize their safety and health.` : ""}
 
                 RESPONSE FORMAT INSTRUCTIONS:
                 Always structure your responses using this exact format:
@@ -259,35 +374,7 @@ const Chatbot = ({ isOpen, onClose }) => {
                 3. [MAIN HEADING]
                    3.1 [Subheading]
                        • Important note
-                       • Key consideration
-
-                Example for weight gain advice:
-
-                1. NUTRITIONAL STRATEGY
-                   • Understanding caloric surplus
-                   • Importance of nutrient density
-
-                2. DIETARY RECOMMENDATIONS
-                   2.1 Core Food Groups
-                       • High-quality proteins
-                       • Complex carbohydrates
-                   
-                   2.2 Meal Structure
-                       • Portion guidelines
-                       • Timing recommendations
-
-                3. IMPLEMENTATION TIPS
-                   3.1 Practical Steps
-                       • Shopping suggestions
-                       • Preparation methods
-
-                Always maintain this exact numbering format (1., 2.1, etc.) and bullet points (•) for consistency.
-                Keep main headings in CAPS, subheadings in Title Case.
-                Ensure each point is concise and actionable.
-
-                User Query: ${inputText}
-
-                Remember: If the query is not about nutrition or diet, respond ONLY with the apology message.`
+                       • Key consideration`
               }]
             }
           ],
@@ -336,7 +423,6 @@ const Chatbot = ({ isOpen, onClose }) => {
         const filtered = prev.filter(msg => !msg.isTyping);
         return [...filtered, { text: botResponse, isBot: true }];
       });
-
     } catch (error) {
       console.error('Error details:', error);
       // Remove typing indicator and add error message
